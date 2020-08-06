@@ -44,7 +44,7 @@ def cell(value, ms_hyperlink=False, bz_hyperlink=False):
         cell = {
             "formulaValue": '=HYPERLINK("https://searchfox.org/mozilla-central/source/{}", "{}")'.format(value, value)
         }
-    if bz_hyperlink:
+    elif bz_hyperlink:
         cell = {
             "formulaValue": '=HYPERLINK("https://bugzilla.mozilla.org/show_bug.cgi?id={}", "{}")'.format(value, value)
         }
