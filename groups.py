@@ -1,9 +1,11 @@
 import re
 
-not_fission_re = re.compile(r'(?<!!)fission')
-debug_re = re.compile(r'fission && \(?debug')
-opt_re = re.compile(r'fission && !debug')
-xorigin_re = re.compile(r'xorigin && fission')
+not_fission_re = re.compile(r'(?<!!)(xorigin|fission)')
+debug_re = re.compile(r'(xorigin|fission)&& \(?debug')
+opt_re = re.compile(r'(xorigin|fission) && !debug')
+
+xorig_and_fis_re = re.compile(r'xorigin && fission')
+xorig_and_not_fis_re = re.compile(r'xorigin && !fission')
 
 
 def match(condition, debug):
@@ -31,7 +33,8 @@ class Test(object):
     module_owner = ''
     assignee = ''
     manager = ''
-    xorigin_only = ''
+    xorig_and_fis = ''
+    xorig_and_not_fis = ''
     fission_target = ''
     comment = ''
 
@@ -43,20 +46,29 @@ class Test(object):
         self.opt_status = get_status(data, False)
         self.debug_status = get_status(data, True)
         self.comment = data.get('comment', '')
-        self.xorigin_only = self.is_xorigin_only(data)
+        self.xorig_and_fis = self.is_xorig_and_fis(data)
+        self.xorig_and_not_fis = self.is_xorig_and_not_fis(data)
 
-    def is_xorigin_only(self, data):
+    def is_xorig_and_fis(self, data):
         if (self.opt_status != 'passes' or self.debug_status != 'passes')\
-            and (xorigin_re.search(data.get('skip-if', '')) or
-                 xorigin_re.search(data.get('fail-if', ''))):
+            and (xorig_and_fis_re.search(data.get('skip-if', '')) or
+                 xorig_and_fis_re.search(data.get('fail-if', ''))):
             return "Y"
-        return self.xorigin_only
+        return self.xorig_and_fis
+
+    def is_xorig_and_not_fis(self, data):
+        if (self.opt_status != 'passes' or self.debug_status != 'passes')\
+            and (xorig_and_not_fis_re.search(data.get('skip-if', '')) or
+                 xorig_and_not_fis_re.search(data.get('fail-if', ''))):
+            return "Y"
+        return self.xorig_and_not_fis
 
     @classmethod
     def from_csv_row(cls, group, row):
         test = cls(group)
         labels = ['bug_id', 'name', 'opt_status', 'debug_status', 
-                  'module_owner', 'assignee', 'manager', 'xorigin_only', 
+                  'module_owner', 'assignee', 'manager', 
+                  'xorig_and_fis', 'xorig_and_not_fis',
                   'fission_target', 'comment']
         for i, attr in enumerate(row):
             setattr(test, labels[i], row[i])

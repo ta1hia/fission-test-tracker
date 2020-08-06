@@ -2,12 +2,14 @@ import json
 
 from groups import Group, Test
 
+
 def get_tests_from_spreadsheet(service, spreadsheet_id, sheet_name):
     """Pulls down the latest copy of an existing Google sheet and 
     generates a list of Groups."""
     res = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=sheet_name).execute()
     test_map = Group.from_csv_spreadsheet(res['values'])
     return test_map  # Used for generating 'existing_tests'
+
 
 def get_tests_from_report(report):
     """Loads tests from a json report (ie './mach test-info report ...')"""
@@ -21,7 +23,8 @@ def get_tests_from_report(report):
     for group, subtests in data.items():
         g = Group(group, subtests)
         test_map[group] = g
-    return test_map # Used for generating 'incoming_tests'
+    return test_map  # Used for generating 'incoming_tests'
+
 
 def clear_sheet(service, spreadsheet_id, sheet_id):
     """Clears a sheet of its contents and cell formatting"""
@@ -31,7 +34,6 @@ def clear_sheet(service, spreadsheet_id, sheet_id):
     # between sheet updates.
     service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id,
                                        body=body).execute()
-
 
 
 def merge_tests(existing_tests, incoming_tests):
@@ -65,13 +67,12 @@ def merge_tests(existing_tests, incoming_tests):
     for group_name, incoming_group in incoming_tests.items():
         not_seen_group.discard(group_name)
         if group_name not in existing_tests:
-            existing_tests[group_name] = Group(group, [])
+            existing_tests[group_name] = Group(group_name, [])
         not_seen = set(existing_tests[group_name].tests.keys())
         for test_name, new_test in incoming_group.tests.items():
             if new_test.name in not_seen:  # test exists, so update fields
-                existing_tests[group_name].tests[test_name].opt_status = new_test.opt_status
-                existing_tests[group_name].tests[test_name].debug_status = new_test.debug_status
-                existing_tests[group_name].tests[test_name].xorigin_only = new_test.xorigin_only
+                for attr in ['opt_status', 'debug_status', 'xorig_and_fis', 'xorig_and_not_fis']:
+                    setattr(existing_tests[group_name].tests[test_name], attr, getattr(new_test, attr))
                 not_seen.discard(test_name)
             else: # new test
                 existing_tests[group_name].tests[test_name] = new_test

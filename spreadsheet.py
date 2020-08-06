@@ -90,7 +90,7 @@ class Cell:
         self.bz_hyperlink = bz_hyperlink
 
 class MainHeader:
-    fields = [Cell("Bug ID"), Cell("Test"), Cell("Opt Status"), Cell("Debug Status"), Cell("Module Owner"), Cell("Assignee"), Cell("Manager"), Cell("xorigin-only"), Cell("Fission Target"), Cell("Comments")]
+    fields = [Cell("Bug ID"), Cell("Test"), Cell("Opt Status"), Cell("Debug Status"), Cell("Module Owner"), Cell("Assignee"), Cell("Manager"), Cell("xorigin && fission"), Cell("xorigin && !fission"), Cell("Fission Target"), Cell("Comments")]
 
     def requests(self, sheet_id, row):
         return [
@@ -120,7 +120,8 @@ class TestRows:
                 Cell(test.module_owner),  # Module Owner
                 Cell(test.assignee),  # Assignee
                 Cell(test.manager),  # Manager
-                Cell(test.xorigin_only),  # xorigin-only
+                Cell(test.xorig_and_fis),  # xorig && fis
+                Cell(test.xorig_and_not_fis),  # xorig && !fis
                 Cell(test.fission_target),  # Fission Target
                 Cell(test.comment),  # Comment
              ])
