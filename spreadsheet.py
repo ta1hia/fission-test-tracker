@@ -4,12 +4,13 @@ import sys
 import json
 import time
 
-from configparser import ConfigParser
+import argparse
+import configparser
 import googleapiclient.discovery
 from authentication import auth  # noqa
 from groups import Group, Test
 from merge import *
-from report import get_report
+
 
 BATCH_SIZE = 100
 
@@ -111,7 +112,7 @@ class GroupHeader:
 class TestRows:
     def __init__(self, tests):
         self.fields = []
-        for test in tests:
+        for test in tests:  # 'tests' is a list of groups.Test objs
             self.fields.append([
                 Cell(test.bug_id, bz_hyperlink=True),  # Bug ID
                 Cell(test.name, ms_hyperlink=True),  # Test
@@ -161,18 +162,13 @@ def update_spreadsheet(service, incoming_report, spreadsheet_id, sheet_id, sheet
     return newly_failing, newly_passing, passing_removed
 
 
-import argparse
-import configparser
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', dest='config', action='store',
                         help='path to configuration file')
     parser.add_argument('-r', '--report', dest='report', action='store',
-                        help='path to json report file')
-    parser.add_argument('-m', '--mode', dest='mode', action='store',
-                        choices=['fisson', 'xorigin'], default='fission',
-                        help='report type to pull down (defaults to fission)')
+                        help='path to json test report file')
     parser.add_argument('--spreadsheet-id', dest='spreadsheet_id', action='store',
                         help='id of Google spreadsheeet')
     parser.add_argument('--sheet-name', dest='sheet_name', action='store',
@@ -189,7 +185,7 @@ if __name__ == "__main__":
         args.sheet_name = config['DEFAULT']['sheet_name']
         args.sheet_id = config['DEFAULT']['sheet_id']
     if not args.report:
-        args.report = get_report(args.mode)
+        args.report = get_full_report()
     if not (args.sheet_name or args.sheet_id or args.spreadsheet_id):
         print('specify a config file or spreadsheet_id, sheet_id, sheet_name')
         sys.exit()

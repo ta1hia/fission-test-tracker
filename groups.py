@@ -1,6 +1,6 @@
 import re
 
-not_fission_re = re.compile(r'(?<!!)(xorigin|fission)')
+not_xorig_or_fis_re = re.compile(r'(?<!!)(xorigin|fission)')
 debug_re = re.compile(r'(xorigin|fission)&& \(?debug')
 opt_re = re.compile(r'(xorigin|fission) && !debug')
 
@@ -13,10 +13,10 @@ def match(condition, debug):
         return False
     if debug:
         return not opt_re.search(condition) and (debug_re.search(condition) or
-                                                 not_fission_re.search(condition))
+                                                 not_xorig_or_fis_re.search(condition))
     else:
         return not debug_re.search(condition) and (opt_re.search(condition) or
-                                                 not_fission_re.search(condition))
+                                                 not_xorig_or_fis_re.search(condition))
 
 
 def get_status(test, debug):
