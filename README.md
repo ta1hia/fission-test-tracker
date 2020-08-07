@@ -3,7 +3,7 @@
 
 Scripts for updating Google Spreadsheet reports for Fission mochitests.  
 
-These scripts pull down the latest fission and xorigin mochitest results on mozilla-central via the Treeherder API and merges any changes with the an existing report in Google Spreadsheets. It also preserves any comments or additional annotations in the spreadsheet between updates.
+This script pulls down the latest fission and xorigin mochitest results against mozilla-central via the Treeherder API and merges any changes with the an existing report in Google Spreadsheets. It also preserves any comments/additional annotations in the spreadsheet between updates.
 
 ### Set Up
 
@@ -18,16 +18,15 @@ pip install -r requirements.txt
 
 ### Usage
 
-```sh
-spreadsheet.py -c [path-to-config]
-```
+
+`spreadsheet.py -c [path-to-config]`
+
 
 This repo includes a config file that points to the existing Fission+XOrigin mochitest spreadsheet in  `xorigin-and-fission.ini`.
 
 
-```sh
-spreadsheet.py --config xorigin-and-fission.ini
-```
+`spreadsheet.py --config xorigin-and-fission.ini`
+
 
 A daily cronjob could look something like this:
 
